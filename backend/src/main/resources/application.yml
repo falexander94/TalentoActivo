@@ -1,0 +1,35 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+spring:
+  application:
+    name: talento-activo-backend
+  datasource:
+    url: jdbc:mysql://localhost:3306/talento_activo?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: ${DB_PASSWORD:27227794#Dec94}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # Reemplazar <YOUR_AUTH0_DOMAIN> con tu dominio real de Auth0 (ej. dev-xxxx.us.auth0.com)
+          issuer-uri: ${AUTH0_ISSUER_URI:https://dev-n7ir8m4kilimjdlh.us.auth0.com/}
+
+auth0:
+  audience: ${AUTH0_AUDIENCE:https://api.talentoactivo.com}
+
+app:
+  cors:
+    allowed-origins: http://localhost:8080,http://localhost:3000

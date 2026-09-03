@@ -1,0 +1,31 @@
+# Operating System
+.DS_Store
+Thumbs.db
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+nbproject/
+build/
+dist/
+
+# Backend (Maven & Java)
+backend/target/
+backend/.mvn/
+*.class
+*.jar
+*.war
+
+# Frontend (Node & Vite)
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+
+# Secrets
+.env
+*.log
