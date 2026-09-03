@@ -25,11 +25,11 @@ spring:
       resourceserver:
         jwt:
           # Reemplazar <YOUR_AUTH0_DOMAIN> con tu dominio real de Auth0 (ej. dev-xxxx.us.auth0.com)
-          issuer-uri: ${AUTH0_ISSUER_URI:https://dev-n7ir8m4kilimjdlh.us.auth0.com/}
+          issuer-uri: https://dev-8xlvbif4xugov43x.us.auth0.com/
 
 auth0:
   audience: ${AUTH0_AUDIENCE:https://api.talentoactivo.com}
 
 app:
   cors:
-    allowed-origins: http://localhost:8080,http://localhost:3000
+    allowed-origins: http://localhost:5173,http://localhost:3000

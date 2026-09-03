@@ -7,8 +7,8 @@ interface Auth0ProviderWithConfigProps {
 
 export const Auth0ProviderWithConfig: React.FC<Auth0ProviderWithConfigProps> = ({ children }) => {
   // Valores por defecto que el usuario puede sobrescribir con variables de entorno o archivo .env
-  const domain = import.meta.env.VITE_AUTH0_DOMAIN || "dev-talentoactivo.us.auth0.com";
-  const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID || "PLACEHOLDER_CLIENT_ID";
+  const domain = import.meta.env.VITE_AUTH0_DOMAIN || "dev-8xlvbif4xugov43x.us.auth0.com";
+  const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID || "s6kjJ7aSc4E6gQUrZClyRs174yy5IWXa";
   const audience = import.meta.env.VITE_AUTH0_AUDIENCE || "https://api.talentoactivo.com";
 
   const onRedirectCallback = (appState: any) => {
@@ -32,14 +32,19 @@ export const Auth0ProviderWithConfig: React.FC<Auth0ProviderWithConfigProps> = (
     );
   }
 
+  const authorizationParams: Record<string, string> = {
+    redirect_uri: window.location.origin,
+  };
+
+  if (import.meta.env.VITE_AUTH0_AUDIENCE) {
+    authorizationParams.audience = import.meta.env.VITE_AUTH0_AUDIENCE;
+  }
+
   return (
     <Auth0Provider
       domain={domain}
       clientId={clientId}
-      authorizationParams={{
-        redirect_uri: window.location.origin,
-        audience: audience,
-      }}
+      authorizationParams={authorizationParams}
       onRedirectCallback={onRedirectCallback}
     >
       {children}

@@ -30,7 +30,7 @@ TalentoActivo/
 
 * **Backend:** Java 17+, Spring Boot 3.2, Spring Security 6, OAuth2 Resource Server, Spring Data JPA.
 * **Frontend:** React 18, Vite, TypeScript, Tailwind CSS, Lucide Icons.
-* **Seguridad & Autenticación:** Auth0 (OpenID Connect / OAuth2 JWT).
+* **Seguridad & Autenticación:** Auth0 (OpenID Connect / OAuth2 JWT) - [Ver Guía Completa de Auth0](AUTH0_SETUP.md).
 * **Base de Datos:** MySQL 8+.
 
 ---
