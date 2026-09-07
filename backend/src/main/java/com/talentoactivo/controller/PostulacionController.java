@@ -12,7 +12,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Collections;
 
 @RestController
 @RequestMapping("/v1/postulaciones")
@@ -37,7 +39,7 @@ public class PostulacionController {
         String auth0Sub = jwt.getSubject();
         return usuarioRepository.findByAuth0Sub(auth0Sub)
                 .map(usuario -> ResponseEntity.ok(postulacionRepository.findByUsuario(usuario)))
-                .orElse(ResponseEntity.ok(List.of()));
+                .orElse(ResponseEntity.ok(Collections.emptyList()));
     }
 
     @PostMapping("/aplicar/{vacanteId}")
