@@ -12,7 +12,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -33,22 +32,38 @@ public class PostulacionController {
 
     @GetMapping("/mis-postulaciones")
     public ResponseEntity<?> listarMisPostulaciones(@AuthenticationPrincipal Jwt jwt) {
+        if (jwt == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
         String auth0Sub = jwt.getSubject();
         return usuarioRepository.findByAuth0Sub(auth0Sub)
                 .map(usuario -> ResponseEntity.ok(postulacionRepository.findByUsuario(usuario)))
-                .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+                .orElse(ResponseEntity.ok(List.of()));
     }
 
     @PostMapping("/aplicar/{vacanteId}")
     public ResponseEntity<?> aplicarAVacante(@AuthenticationPrincipal Jwt jwt,
                                              @PathVariable Long vacanteId,
                                              @RequestBody(required = false) Map<String, String> payload) {
+        if (jwt == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Token JWT no proporcionado"));
+        }
+
         String auth0Sub = jwt.getSubject();
+        String correo = jwt.getClaimAsString("email");
+        if (correo == null || correo.isBlank()) {
+            correo = auth0Sub.replace("|", "_") + "@talentoactivo.com";
+        }
+
+        // Obtener o crear automáticamente el usuario si no ha sido sincronizado previamente
         Usuario usuario = usuarioRepository.findByAuth0Sub(auth0Sub)
-                .orElseThrow(() -> new RuntimeException("Usuario no registrado en la base de datos"));
+                .orElseGet(() -> usuarioRepository.save(new Usuario(auth0Sub, "Usuario Autenticado", correo, "", "", "CANDIDATO")));
 
         Vacante vacante = vacanteRepository.findById(vacanteId)
-                .orElseThrow(() -> new RuntimeException("Vacante no encontrada"));
+                .orElse(null);
+
+        if (vacante == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Vacante no encontrada con ID: " + vacanteId));
+        }
 
         // Verificar si ya se postuló
         if (postulacionRepository.findByUsuarioAndVacante(usuario, vacante).isPresent()) {

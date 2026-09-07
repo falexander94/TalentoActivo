@@ -21,20 +21,33 @@ public class UsuarioController {
 
     @GetMapping("/me")
     public ResponseEntity<?> obtenerMiPerfil(@AuthenticationPrincipal Jwt jwt) {
+        if (jwt == null) {
+            return ResponseEntity.status(401).body(Map.of("message", "Token JWT no proporcionado o inválido"));
+        }
+
         String auth0Sub = jwt.getSubject();
-        
         return usuarioRepository.findByAuth0Sub(auth0Sub)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping("/sincronizar")
-    public ResponseEntity<Usuario> sincronizarUsuario(@AuthenticationPrincipal Jwt jwt, @RequestBody Map<String, String> payload) {
-        String auth0Sub = jwt.getSubject();
-        String correo = jwt.getClaimAsString("email") != null ? jwt.getClaimAsString("email") : payload.get("correo");
-        String nombre = payload.getOrDefault("nombre", "Usuario TalentoActivo");
-        String fotoUrl = payload.getOrDefault("fotoUrl", "");
-        String telefono = payload.getOrDefault("telefono", "");
+    public ResponseEntity<Usuario> sincronizarUsuario(
+            @AuthenticationPrincipal Jwt jwt, 
+            @RequestBody(required = false) Map<String, String> payload) {
+        
+        String auth0Sub = jwt != null ? jwt.getSubject() : "anonymous";
+        String correoFromJwt = jwt != null ? jwt.getClaimAsString("email") : null;
+        String correoPayload = payload != null ? payload.get("correo") : null;
+        
+        String correo = (correoFromJwt != null && !correoFromJwt.isBlank()) ? correoFromJwt : correoPayload;
+        if (correo == null || correo.isBlank()) {
+            correo = auth0Sub.replace("|", "_") + "@talentoactivo.com";
+        }
+
+        String nombre = payload != null ? payload.getOrDefault("nombre", "Usuario TalentoActivo") : "Usuario TalentoActivo";
+        String fotoUrl = payload != null ? payload.getOrDefault("fotoUrl", "") : "";
+        String telefono = payload != null ? payload.getOrDefault("telefono", "") : "";
 
         Usuario usuario = usuarioRepository.findByAuth0Sub(auth0Sub)
                 .orElseGet(() -> new Usuario(auth0Sub, nombre, correo, telefono, fotoUrl, "CANDIDATO"));
