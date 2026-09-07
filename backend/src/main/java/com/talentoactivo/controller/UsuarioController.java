@@ -40,22 +40,22 @@ public class UsuarioController {
         String correoFromJwt = jwt != null ? jwt.getClaimAsString("email") : null;
         String correoPayload = payload != null ? payload.get("correo") : null;
         
-        String correo = (correoFromJwt != null && !correoFromJwt.isBlank()) ? correoFromJwt : correoPayload;
-        if (correo == null || correo.isBlank()) {
-            correo = auth0Sub.replace("|", "_") + "@talentoactivo.com";
-        }
+        String correoTemp = (correoFromJwt != null && !correoFromJwt.isBlank()) ? correoFromJwt : correoPayload;
+        final String correoFinal = (correoTemp != null && !correoTemp.isBlank()) 
+                ? correoTemp 
+                : auth0Sub.replace("|", "_") + "@talentoactivo.com";
 
-        String nombre = payload != null ? payload.getOrDefault("nombre", "Usuario TalentoActivo") : "Usuario TalentoActivo";
-        String fotoUrl = payload != null ? payload.getOrDefault("fotoUrl", "") : "";
-        String telefono = payload != null ? payload.getOrDefault("telefono", "") : "";
+        final String nombreFinal = payload != null ? payload.getOrDefault("nombre", "Usuario TalentoActivo") : "Usuario TalentoActivo";
+        final String fotoUrlFinal = payload != null ? payload.getOrDefault("fotoUrl", "") : "";
+        final String telefonoFinal = payload != null ? payload.getOrDefault("telefono", "") : "";
 
         Usuario usuario = usuarioRepository.findByAuth0Sub(auth0Sub)
-                .orElseGet(() -> new Usuario(auth0Sub, nombre, correo, telefono, fotoUrl, "CANDIDATO"));
+                .orElseGet(() -> new Usuario(auth0Sub, nombreFinal, correoFinal, telefonoFinal, fotoUrlFinal, "CANDIDATO"));
 
-        usuario.setNombre(nombre);
-        usuario.setCorreo(correo);
-        if (!fotoUrl.isBlank()) usuario.setFotoUrl(fotoUrl);
-        if (!telefono.isBlank()) usuario.setTelefono(telefono);
+        usuario.setNombre(nombreFinal);
+        usuario.setCorreo(correoFinal);
+        if (!fotoUrlFinal.isBlank()) usuario.setFotoUrl(fotoUrlFinal);
+        if (!telefonoFinal.isBlank()) usuario.setTelefono(telefonoFinal);
 
         Usuario usuarioGuardado = usuarioRepository.save(usuario);
         return ResponseEntity.ok(usuarioGuardado);
