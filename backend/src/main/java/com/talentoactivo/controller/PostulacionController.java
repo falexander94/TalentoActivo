@@ -51,14 +51,14 @@ public class PostulacionController {
         }
 
         String auth0Sub = jwt.getSubject();
-        String correo = jwt.getClaimAsString("email");
-        if (correo == null || correo.isBlank()) {
-            correo = auth0Sub.replace("|", "_") + "@talentoactivo.com";
-        }
+        String correoClaim = jwt.getClaimAsString("email");
+        final String correoFinal = (correoClaim != null && !correoClaim.isBlank()) 
+                ? correoClaim 
+                : auth0Sub.replace("|", "_") + "@talentoactivo.com";
 
         // Obtener o crear automáticamente el usuario si no ha sido sincronizado previamente
         Usuario usuario = usuarioRepository.findByAuth0Sub(auth0Sub)
-                .orElseGet(() -> usuarioRepository.save(new Usuario(auth0Sub, "Usuario Autenticado", correo, "", "", "CANDIDATO")));
+                .orElseGet(() -> usuarioRepository.save(new Usuario(auth0Sub, "Usuario Autenticado", correoFinal, "", "", "CANDIDATO")));
 
         Vacante vacante = vacanteRepository.findById(vacanteId)
                 .orElse(null);
